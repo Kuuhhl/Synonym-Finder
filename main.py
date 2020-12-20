@@ -3,6 +3,8 @@ from tkinter import ttk
 import re
 import spacy
 import itertools
+from tkinter.filedialog import askopenfilename
+import os
 
 
 def writeChanges(sentence):
@@ -117,20 +119,26 @@ def populateTextArea(sentences, sentenceNumber, textFrame, root):
                 break
 
 
+def askTextDir(root):
+    root.withdraw()
+    return askopenfilename(
+        title="Select text file",
+        initialdir=os.getcwd,
+        filetypes=(("Text files", "*.txt"),),
+    )
+
+
 def main():
     global nlp
     nlp = spacy.load("de_core_news_sm")
-    try:
-        with open("original.txt", "r", encoding="UTF-8") as f:
-            text = f.read().replace("\n", "")
-    except FileNotFoundError:
-        exit("Please create a file called 'original.txt'")
+    root = Tk()
+    with open(askTextDir(root), "r", encoding="UTF-8") as f:
+        text = f.read().replace("\n", "")
     sentences = splitSentences(text)
 
-    root = Tk()
     textFrame = Frame(master=root)
     textFrame.grid(row=1, column=0)
-
+    root.deiconify()
     continueToNext(sentences, -1, textFrame, root)
 
     root.mainloop()
